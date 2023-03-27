@@ -7,3 +7,5 @@ flameshot &
 /usr/lib64/polkit-gnome/polkit-gnome-authentication-agent-1 &
 blueman-manager &
 kwalletd5 &
+telegram-desktop &
+webcord &

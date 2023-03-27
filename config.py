@@ -38,6 +38,7 @@ mod = "mod4"
 terminal = "terminator"
 files = "thunar"
 browser = "brave"
+layoutmargins = 5
 
 keys = [
     # A list of available commands that can be bound to keys can be found
@@ -77,10 +78,10 @@ keys = [
 
 groups = [
     Group("1", label="", matches=[Match(wm_class=["LibreWolf", "firefox", "brave"])]), #Brows
-    Group("2", label="", matches=[Match(wm_class=["terminator", "kitty"])]), #CMD
+    Group("2", label="", matches=[Match(wm_class=["terminator", "kitty"])], layout="monadwide"), #CMD
     Group("3", label="󰨞", matches=[Match(wm_class=["code-oss"])]), #Dev
-    Group("4", label="󰵅", matches=[Match(wm_class=["telegram-desktop"])]), #Com
-    Group("5", label=""), #Games
+    Group("4", label="󰵅", matches=[Match(wm_class=["telegram-desktop", "webcord"])], layout="monadtall"), #Com
+    Group("5", label="", layout="max"), #Games
     Group("6", label="", matches=[Match(wm_class=["VirtualBox Machine", "VirtualBox Manager"])]), #VM
     Group("7", label=""), #Video
     Group("8", label="A"), #A
@@ -117,14 +118,14 @@ for i in groups:
     )
 
 layouts = [
-    layout.Columns(margin=5, border_focus=colors[1], border_width=2, border_normal=colors[2]),
+    layout.Columns(margin=layoutmargins, border_focus=colors[1], border_width=2, border_normal=colors[2]),
     layout.Max(),
     # Try more layouts by unleashing below layouts.
     # layout.Stack(num_stacks=2),
     # layout.Bsp(),
     # layout.Matrix(),
-    layout.MonadTall(),
-    layout.MonadWide(),
+    layout.MonadTall(margin=layoutmargins, border_width=2, border_focus=colors[1], border_normal=colors[2]),
+    layout.MonadWide(margin=layoutmargins, border_width=2, border_focus=colors[1], border_normal=colors[2]),
     # layout.RatioTile(),
     # layout.Tile(),
     # layout.TreeTab(),
