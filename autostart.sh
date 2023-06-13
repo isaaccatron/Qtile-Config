@@ -1,9 +1,6 @@
-#!/usr/bin/env bash
-
+#! /bin/sh
 nitrogen --restore &
-pa-applet &
 nm-applet &
-flameshot &
-/usr/lib64/polkit-gnome/polkit-gnome-authentication-agent-1 &
 blueman-manager &
-kwalletd5 &
+/usr/libexec/polkit-gnome-authentication-agent-1 &
+fameshot &

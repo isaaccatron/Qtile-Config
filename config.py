@@ -24,72 +24,77 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from libqtile import bar, layout, widget
+from libqtile import bar, layout, widget, hook
 from libqtile.config import Click, Drag, Group, Key, Match, Screen
 from libqtile.lazy import lazy
-from libqtile.utils import guess_terminal
-from libqtile import hook
 import os
 import subprocess
 
-
-
 mod = "mod4"
 terminal = "terminator"
-files = "thunar"
-browser = "brave"
+browser = "librewolf"
+filemanager = "nemo"
+colors = [
+    ['421869', '421869'],  # Background
+    ['995bd5', '995bd5'],  # Colors
+    ['721cb8', '721cb8']  # Colors but darker
+]
 
 keys = [
     # A list of available commands that can be bound to keys can be found
     # at https://docs.qtile.org/en/latest/manual/config/lazy.html
     # Switch between windows
-    #Key([mod], "h", lazy.layout.left(), desc="Move focus to left"),
-    #Key([mod], "l", lazy.layout.right(), desc="Move focus to right"),
-    #Key([mod], "j", lazy.layout.down(), desc="Move focus down"),
-    #Key([mod], "k", lazy.layout.up(), desc="Move focus up"),
-    Key([mod], "space", lazy.layout.next(), desc="Move window focus to other window"),
+    Key([mod], "h", lazy.layout.left(), desc="Move focus to left"),
+    Key([mod], "l", lazy.layout.right(), desc="Move focus to right"),
+    Key([mod], "j", lazy.layout.down(), desc="Move focus down"),
+    Key([mod], "k", lazy.layout.up(), desc="Move focus up"),
+
     # Move windows between left/right columns or move up/down in current stack.
     # Moving out of range in Columns layout will create new column.
     Key([mod, "shift"], "h", lazy.layout.shuffle_left(), desc="Move window to the left"),
     Key([mod, "shift"], "l", lazy.layout.shuffle_right(), desc="Move window to the right"),
     Key([mod, "shift"], "j", lazy.layout.shuffle_down(), desc="Move window down"),
     Key([mod, "shift"], "k", lazy.layout.shuffle_up(), desc="Move window up"),
-    # Grow windows. Immmf current window is on the edge of screen and direction
+    # Grow windows. If current window is on the edge of screen and direction
     # will be to screen edge - window would shrink.
     Key([mod, "control"], "h", lazy.layout.grow_left(), desc="Grow window to the left"),
     Key([mod, "control"], "l", lazy.layout.grow_right(), desc="Grow window to the right"),
     Key([mod, "control"], "j", lazy.layout.grow_down(), desc="Grow window down"),
     Key([mod, "control"], "k", lazy.layout.grow_up(), desc="Grow window up"),
-
     Key([mod], "n", lazy.layout.normalize(), desc="Reset all window sizes"),
+    # Toggle between split and unsplit sides of stack.
+    # Split = all windows displayed
+    # Unsplit = 1 window displayed, like Max layout, but still with
+    # multiple stack panes
+
+    #           RELEVENT KEYS
+
+    # Application Starts
     Key([mod], "t", lazy.spawn(terminal), desc="Launch terminal"),
+    Key([mod], "f", lazy.spawn(filemanager), desc="Launch filermanager"),
+    Key([mod], "r", lazy.spawn("rofi -show drun"), desc="Spawn a command using a prompt widget"),
+    Key([mod], "b", lazy.spawn(browser), desc="Launch Browser"),
+
+    # Window Management
+    Key([mod], "space", lazy.layout.next(), desc="Move window focus to other window"),
     Key([mod], "Tab", lazy.next_layout(), desc="Toggle between layouts"),
     Key([mod], "q", lazy.window.kill(), desc="Kill focused window"),
+
     Key([mod, "control"], "r", lazy.reload_config(), desc="Reload the config"),
     Key([mod], "m", lazy.shutdown(), desc="Shutdown Qtile"),
-    Key([mod], "r", lazy.spawn("rofi -show drun"), desc="Spawn a command using a prompt widget"),
-    Key([mod], "f", lazy.spawn(files), desc="Spawn file managers"),
-    Key([mod], "k", lazy.spawn("VBoxManage startvm 'Kali Linux'"), desc="Starts kali vm"),
-    Key([mod], "b", lazy.spawn(browser), desc="Starts the browser"),
-    Key([mod, "control"], "b", lazy.spawn("blueman-manager"), desc="Opens blueman manager"),
-    Key([mod, "control"], "n", lazy.spawn("nm-applet"), desc="Starts nm-applet"),
+
 ]
 
 groups = [
-    Group("1", label="", matches=[Match(wm_class=["LibreWolf", "firefox", "brave"])]), #Brows
-    Group("2", label="", matches=[Match(wm_class=["terminator", "kitty"])]), #CMD
-    Group("3", label="󰨞", matches=[Match(wm_class=["code-oss"])]), #Dev
-    Group("4", label="󰵅", matches=[Match(wm_class=["telegram-desktop"])]), #Com
-    Group("5", label=""), #Games
-    Group("6", label="", matches=[Match(wm_class=["VirtualBox Machine", "VirtualBox Manager"])]), #VM
-    Group("7", label=""), #Video
-    Group("8", label="A"), #A
-    Group("9", label="B")  #B
-]
-colors = [
-    ['321a16', '321a16'], # Background
-    ['dc7360', 'dc7360'], # Colors
-    ['6e3a30', '6e3a30'] # Colors but darker
+    Group("1", label="WWW", matches=[Match(wm_class=["LibreWolf"])]),  # Brows
+    Group("2", label="CMD" , matches=[Match(wm_class=["Terminator"])]),  # CMD
+    Group("3", label="DEV", matches=[Match(wm_class=["jetbrains-pycharm", "jetbrains-fleet", "jetbrains-webstorm", "jetbrains-rider"])]),  # Dev
+    Group("4", label="MSG", matches=[Match(wm_class=["telegram-desktop"])]),  # Com
+    Group("5", label="VM"),  # Games
+    Group("6", label="A"),  # VM
+    Group("7", label="B"),  # Video
+    Group("8", label="C"),  # A
+    Group("9", label="D")  # B
 ]
 
 for i in groups:
@@ -117,14 +122,14 @@ for i in groups:
     )
 
 layouts = [
-    layout.Columns(margin=5, border_focus=colors[1], border_width=2, border_normal=colors[2]),
-    layout.Max(),
+    layout.Columns(margin=5, border_focus=colors[1], border_width=2, border_normal=colors[2], border_on_single=True),
+    layout.Max(margin=5, border_focus=colors[1], border_width=2, border_normal=colors[2]),
     # Try more layouts by unleashing below layouts.
     # layout.Stack(num_stacks=2),
     # layout.Bsp(),
     # layout.Matrix(),
-    layout.MonadTall(),
-    layout.MonadWide(),
+    # layout.MonadTall(),
+    # layout.MonadWide(),
     # layout.RatioTile(),
     # layout.Tile(),
     # layout.TreeTab(),
@@ -143,19 +148,22 @@ screens = [
     Screen(
         top=bar.Bar(
             [
-                widget.GroupBox(fontsize=23, background=colors[0], highlight_method='text', this_current_screen_border=colors[2], active=colors[1], foreground=colors[1], inactive=colors[1], fontshadow='000000'),
+                widget.GroupBox(fontsize=20, background=colors[0], highlight_method='text',
+                                this_current_screen_border=colors[2], active=colors[1], foreground=colors[1],
+                                inactive=colors[1], fontshadow='000000'),
                 widget.CurrentLayout(background=colors[0]),
                 widget.Prompt(background=colors[0]),
                 widget.WindowName(background=colors[0]),
-
                 # NB Systray is incompatible with Wayland, consider using StatusNotifier instead
                 # widget.StatusNotifier(),
-                #widget.Battery(backgrond=colors[0]),
                 widget.Systray(background=colors[0]),
-                widget.Backlight(background=colors[0], backlight_name="backlight", brightness_file="/sys/class/backlight/intel_backlight/brightness", max_brightness_file="/sys/class/backlight/intel_backlight/max_brightness", step=5, change_command="brightnessctl set {0}%"),
+                widget.Backlight(background=colors[0], backlight_name="backlight",
+                                 brightness_file="/sys/class/backlight/intel_backlight/brightness",
+                                 max_brightness_file="/sys/class/backlight/intel_backlight/max_brightness", step=5,
+                                 change_command="brightnessctl set {0}%"),
                 widget.Clock(format="%m-%d %I:%M %p", background=colors[0]),
             ],
-            25
+            24,
             # border_width=[2, 0, 2, 0],  # Draw top and bottom borders
             # border_color=["ff00ff", "000000", "ff00ff", "000000"]  # Borders are magenta
         ),
@@ -177,25 +185,27 @@ cursor_warp = False
 floating_layout = layout.Floating(
     float_rules=[
         # Run the utility of `xprop` to see the wm class and name of an X client.
-        #*layout.Floating.default_float_rules,
+        *layout.Floating.default_float_rules,
         Match(wm_class="confirmreset"),  # gitk
         Match(wm_class="makebranch"),  # gitk
         Match(wm_class="maketag"),  # gitk
         Match(wm_class="ssh-askpass"),  # ssh-askpass
-        Match(wm_class="unityhub"),
-        Match(wm_class="blueman-manager"),
         Match(title="branchdialog"),  # gitk
-        Match(wm_class="nm-applet"),
-        Match(wm_class="ocs-url"),
-        Match(wm_class="JetBrains Toolbox"),
-        Match(wm_class="kwalletd5"),
-        Match(wm_class="github desktop"),
-        Match(wm_class="blueman-applet"),
+        Match(title="pinentry"),  # GPG key password entry
+        Match(wm_class="blueman-manager"),
+        Match(wm_class="nm-connection-editor"),
     ]
 )
 auto_fullscreen = True
 focus_on_window_activation = "smart"
 reconfigure_screens = True
+
+
+@hook.subscribe.startup_once
+def start_once():
+    home = os.path.expanduser('~')
+    subprocess.call([home + '/.config/qtile/autostart.sh'])
+
 
 # If things like steam games want to auto-minimize themselves when losing
 # focus, should we respect this or not?
@@ -203,12 +213,6 @@ auto_minimize = True
 
 # When using the Wayland backend, this can be used to configure input devices.
 wl_input_rules = None
-
-@hook.subscribe.startup_once
-def start_once():
-    home = os.path.expanduser('~')
-    subprocess.call([home + '/.config/qtile/autostart.sh'])
-
 
 # XXX: Gasp! We're lying here. In fact, nobody really uses or cares about this
 # string besides java UI toolkits; you can see several discussions on the
